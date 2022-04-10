@@ -1,8 +1,8 @@
-# Health Care App (vue3-health-care-data-project)
+# Health Care Data Visualization Project
 
 ## introduction
 
-- A Health Care Data Project With Vue3
+- A health care data visualization project with vue3
 
 ## Technologies
 
@@ -10,7 +10,7 @@
 - `Element Plus`
 - `Alga-js`
 - `Axios`
-- `Chart.js`
+- `Vue-Chart-3.js`
 - `SCSS`
 - `Font Awesome`
 - `Postman`
@@ -44,3 +44,5 @@ npm run serve
 ```bash
 npm run build
 ```
+
+## Priority
