@@ -6,7 +6,7 @@
 
   <!-- chart tab -->
   <el-tabs
-    v-model="activeName"
+    v-model="activeChart"
     type="card"
     class="wrapper-chart-tab"
     @tab-click="handleClick"
@@ -20,18 +20,14 @@
     </el-tab-pane>
 
     <el-tab-pane label="민족별" name="ethnicity">
-      <PieChart :chartData="chartEthnicity" />
+      <PieChart :chartData="chartGender" />
     </el-tab-pane>
 
     <el-tab-pane label="성별 + 인종별" name="GenderRace">
-      <PieChart :chartData="chartGenderRace" />
+      <PieChart :chartData="chartGender" />
     </el-tab-pane>
 
     <el-tab-pane label="성별 + 민족별" name="GenderEthnicity">
-      <PieChart :chartData="chartGenderEthnicity" />
-    </el-tab-pane>
-
-    <el-tab-pane label="성별" name="gender">
       <PieChart :chartData="chartGender" />
     </el-tab-pane>
   </el-tabs>
@@ -51,16 +47,29 @@ export default {
   props: {},
   data() {
     return {
-      chartData: {
+      chartGender: {
         labels: [],
-        datasets: [{ data: {} }]
-      }
+        datasets: [
+          {
+            data: [],
+            backgroundColor: []
+          }
+        ]
+      },
+      activeChart: 'gender',
+      originData: []
     };
+  },
+  computed: {
+    chartRace() {
+      return this.getDataSets2(this.originData, 'race');
+    }
   },
   created() {
     this.fetchChartData().then((res) => {
-      this.chartData.datasets.data = this.getChartData(res, 'gender');
-      this.chartData.datasets.labels = this.getChartLable(res);
+      this.getDataSets(res);
+      console.log(res);
+      this.originData = res;
     });
   },
   methods: {
@@ -69,11 +78,70 @@ export default {
       const result = await this.fetchData('get', url);
       return result.stats;
     },
-    getChartData(res, type) {
-      console.log(res, type);
+    getDataSets2(origin, type) {
+      console.log(origin);
+      let labels = [];
+      let data = [];
+      let backgroundColor = [];
+
+      for (const [index, value] of origin.entries()) {
+        // 이미 ele 의 gender가 label에 있으면 같은 index 위치가 매칭되는 녀석이니까 data[index]
+        const indexEle = labels.findIndex((ele) => {
+          console.log(value[type]);
+          return ele === value[type];
+        });
+        console.log(indexEle);
+        // 이미 있으면
+        if (indexEle > -1) {
+          data[indexEle]++;
+        } else {
+          // 아직 없으면
+          console.log(origin[index][type]);
+          labels.push(origin[index][type]);
+          data.push(1);
+          backgroundColor.push(
+            `rgba(${this.getRandomRgb()}, ${this.getRandomRgb()}, ${this.getRandomRgb()}, 0.5)`
+          );
+        }
+      }
+      return [data, labels, backgroundColor];
     },
-    getChartLable(res) {
-      console.log(res);
+    getDataSets(origin) {
+      console.log(origin);
+      let labels = [];
+      let data = [];
+      let backgroundColor = [];
+
+      for (const [index, value] of origin.entries()) {
+        // 이미 ele 의 gender가 label에 있으면 같은 index 위치가 매칭되는 녀석이니까 data[index]
+        const indexEle = labels.findIndex((ele) => {
+          console.log(ele);
+          console.log(value.gender);
+          console.log(index);
+          return ele === value.gender;
+        });
+        console.log(indexEle);
+        // 이미 있으면
+        if (indexEle > -1) {
+          data[indexEle]++;
+        } else {
+          // 아직 없으면
+          console.log(origin[index]['gender']);
+          labels.push(origin[index]['gender']);
+          data.push(1);
+          backgroundColor.push(
+            `rgba(${this.getRandomRgb()}, ${this.getRandomRgb()}, ${this.getRandomRgb()}, 0.5)`
+          );
+        }
+      }
+      console.log(data);
+      this.chartGender.datasets[0].data = data;
+      this.chartGender.labels = labels;
+      this.chartGender.datasets[0].backgroundColor = backgroundColor;
+      console.log(this.chartGender);
+    },
+    getRandomRgb() {
+      return Math.floor(Math.random() * 256);
     }
   },
   setup() {
@@ -88,21 +156,6 @@ export default {
       responsive: true,
       maintainAspectRatio: false
     });
-    // const chartGender = {
-    //   labels: ['Paris', 'Nîmes', 'Toulon', 'Perpignan', 'Autre'],
-    //   datasets: [
-    //     {
-    //       data: [30, 40, 60, 70, 5],
-    //       backgroundColor: [
-    //         '#77CEFF',
-    //         '#0079AF',
-    //         '#123E6B',
-    //         '#97B0C4',
-    //         '#A5C8ED'
-    //       ]
-    //     }
-    //   ]
-    // };
 
     return { options };
   }
@@ -126,5 +179,11 @@ export default {
     display: flex;
     justify-content: center;
   }
+}
+</style>
+<style lang="scss">
+.el-tabs__content {
+  width: 50rem;
+  display: contents;
 }
 </style>

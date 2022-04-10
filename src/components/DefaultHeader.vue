@@ -1,5 +1,5 @@
 <template>
-  <a class="font-22">Health Care App</a>
+  <a class="font-22">Health Care Data Visualization</a>
 </template>
 
 <script>
